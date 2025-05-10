@@ -83,7 +83,11 @@ const CalendarPage: React.FC = () => {
   const tasksGroupedByProject = useMemo(() => {
     const tasks = dateRange.from && dateRange.to ? tasksByDateRange : tasksByDate;
     
-    const grouped: Record<string, any[]> = {};
+    const grouped: Record<string, {
+      projectId: string | number;
+      projectName: string;
+      tasks: any[];
+    }> = {};
     
     tasks.forEach(task => {
       const projectId = task.project?.id;
@@ -129,6 +133,17 @@ const CalendarPage: React.FC = () => {
       
       return { start: newStart, end: newEnd };
     });
+  };
+
+  // Helper function to handle date selection for single date or range
+  const handleDateSelection = (value: Date | { from: Date; to: Date } | undefined) => {
+    if (!value) return;
+
+    if (value instanceof Date) {
+      setDate(value);
+    } else {
+      setDateRange(value);
+    }
   };
 
   return (
@@ -208,7 +223,7 @@ const CalendarPage: React.FC = () => {
                 <Calendar
                   mode={dateRange.from ? "range" : "single"}
                   selected={dateRange.from ? dateRange : date}
-                  onSelect={dateRange.from ? setDateRange : setDate}
+                  onSelect={handleDateSelection}
                   className="pointer-events-auto border rounded-md"
                   locale={es}
                 />
@@ -251,7 +266,7 @@ const CalendarPage: React.FC = () => {
                       </p>
                     </div>
                   ) : (
-                    tasksGroupedByProject.map((group: any) => (
+                    tasksGroupedByProject.map((group) => (
                       <div key={group.projectId} className="space-y-3">
                         <div className="bg-muted/50 p-2 rounded-md">
                           <h4 className="font-medium">{group.projectName}</h4>

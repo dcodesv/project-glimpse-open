@@ -69,7 +69,11 @@ export const WorkloadBarChart: React.FC<WorkloadBarChartProps> = ({ data }) => {
         <CartesianGrid strokeDasharray="3 3" stroke="#888" opacity={0.2} />
         <XAxis 
           dataKey="name"
-          tick={{ fontSize: 12, angle: -45, textAnchor: 'end' }}
+          tick={{ 
+            fontSize: 12,
+            textAnchor: 'end',
+            transform: 'rotate(-45)'
+          }}
           height={60}
           stroke="currentColor"
           opacity={0.7}
