@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Calendar as CalendarIcon, Filter, User } from "lucide-react";
 import { format, parseISO, addDays, isSameDay } from "date-fns";
@@ -135,15 +134,17 @@ const CalendarPage: React.FC = () => {
     });
   };
 
-  // Helper function to handle date selection for single date or range
-  const handleDateSelection = (value: Date | { from: Date; to: Date } | undefined) => {
-    if (!value) return;
-
-    if (value instanceof Date) {
-      setDate(value);
-    } else {
-      setDateRange(value);
+  // Helper functions for date handling
+  const handleSingleDateSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+      setDateRange({ from: undefined, to: undefined });
     }
+  };
+
+  const handleRangeSelect = (range: { from: Date | undefined; to: Date | undefined }) => {
+    setDateRange(range);
+    setDate(undefined);
   };
 
   return (
@@ -220,13 +221,24 @@ const CalendarPage: React.FC = () => {
                   </div>
                 </div>
 
-                <Calendar
-                  mode={dateRange.from ? "range" : "single"}
-                  selected={dateRange.from ? dateRange : date}
-                  onSelect={handleDateSelection}
-                  className="pointer-events-auto border rounded-md"
-                  locale={es}
-                />
+                {/* Render different Calendar components based on mode */}
+                {dateRange.from ? (
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={handleRangeSelect}
+                    className="pointer-events-auto border rounded-md"
+                    locale={es}
+                  />
+                ) : (
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={handleSingleDateSelect}
+                    className="pointer-events-auto border rounded-md" 
+                    locale={es}
+                  />
+                )}
                 
                 <div className="text-sm text-muted-foreground text-center">
                   {date && !dateRange.from && (
