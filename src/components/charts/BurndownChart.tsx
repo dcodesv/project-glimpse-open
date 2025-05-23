@@ -29,11 +29,21 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
       const start = parseISO(startDate);
       const end = parseISO(endDate);
 
+      // Filter only user stories (type ID 6)
+      const userStories = tasks.filter(task => 
+        task?._links?.type?.href?.split("/").pop() === "6"
+      );
+
+      // If no user stories, return empty data
+      if (!userStories.length) {
+        return [];
+      }
+
       // Get all days in the interval
       const days = eachDayOfInterval({ start, end });
 
       // Calculate total story points
-      const totalStoryPoints = tasks.reduce((sum, task) => {
+      const totalStoryPoints = userStories.reduce((sum, task) => {
         return sum + (task.storyPoints || 0);
       }, 0);
 
@@ -47,7 +57,7 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
         const idealRemaining = Math.max(0, idealBurndown - (dailyIdealBurn * index));
 
         // Calculate actual remaining work based on completed tasks
-        const actualRemaining = tasks.reduce((sum, task) => {
+        const actualRemaining = userStories.reduce((sum, task) => {
           // For tasks completed before or on this day, don't count their points
           if (task.percentDone === 100 && task.dueDate) {
             const dueDate = parseISO(task.dueDate);
