@@ -32,14 +32,14 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
       // Get all days in the interval
       const days = eachDayOfInterval({ start, end });
 
-      // Calculate total estimated hours
-      const totalEstimatedHours = tasks.reduce((sum, task) => {
-        return sum + (task.estimatedTime || 0);
+      // Calculate total story points
+      const totalStoryPoints = tasks.reduce((sum, task) => {
+        return sum + (task.storyPoints || 0);
       }, 0);
 
       // Initialize ideal burndown data
-      const idealBurndown = totalEstimatedHours;
-      const dailyIdealBurn = totalEstimatedHours / days.length;
+      const idealBurndown = totalStoryPoints;
+      const dailyIdealBurn = totalStoryPoints / days.length;
 
       // Generate burndown data
       return days.map((day, index) => {
@@ -48,7 +48,7 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
 
         // Calculate actual remaining work based on completed tasks
         const actualRemaining = tasks.reduce((sum, task) => {
-          // For tasks completed before or on this day, don't count their hours
+          // For tasks completed before or on this day, don't count their points
           if (task.percentDone === 100 && task.dueDate) {
             const dueDate = parseISO(task.dueDate);
             if (isSameDay(dueDate, day) || isAfter(day, dueDate)) {
@@ -58,11 +58,11 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
           
           // For tasks in progress, count their remaining percentage
           if (task.percentDone > 0 && task.percentDone < 100) {
-            return sum - ((task.estimatedTime || 0) * (task.percentDone / 100));
+            return sum - ((task.storyPoints || 0) * (task.percentDone / 100));
           }
           
-          // For tasks not started, count their full hours
-          return sum + (task.estimatedTime || 0);
+          // For tasks not started, count their full points
+          return sum + (task.storyPoints || 0);
         }, 0);
 
         return {
@@ -104,7 +104,7 @@ export const BurndownChart: React.FC<BurndownChartProps> = ({ tasks, startDate, 
           tickMargin={8}
           stroke="currentColor"
           opacity={0.7}
-          label={{ value: 'Horas restantes', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+          label={{ value: 'Story Points restantes', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
         />
         <Tooltip 
           contentStyle={{ 
